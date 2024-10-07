@@ -73,22 +73,25 @@ class UserController extends Controller
         ];
         $activeMenu = 'user'; // set menu yang sedang aktif
 
+        $level = LevelModel::all();
+
         return view('user.index', [
             'breadcrumb' => $breadcrumb,
             'page'       => $page,
+            'level'      => $level,
             'activeMenu' => $activeMenu
         ]);
     }
 
-    // Ambil data user dalam bentuk JSON untuk DataTables
     public function list(Request $request)
     {
-        // Ambil data user dari model User, pilih kolom user_id, username, name, dan level_id
-        // serta relasi dengan model Level
         $users = UserModel::select('user_id', 'username', 'nama', 'level_id')
                         ->with('level');
 
-        // Menggunakan DataTables untuk menampilkan data user
+        if ($request->level_id) {
+            $users->where('level_id', $request->level_id);
+        }
+
         return DataTables::of($users)
             ->addIndexColumn()
             ->addColumn('aksi', function ($user) {
