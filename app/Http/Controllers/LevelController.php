@@ -20,5 +20,6 @@ class LevelController extends Controller
         
         //$data = DB::select('select * from m_level');
         //return view('level', ['data' => $data]);
+        return view('level', ['level' => $level]);
     }
 }
