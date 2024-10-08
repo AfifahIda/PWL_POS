@@ -24,8 +24,8 @@
             </div>
             <div class="form-group">
                 <label>Nama</label>
-                <input value="" type="text" name="name" id="name" class="form-control" required>
-                <small id="error-name" class="error-text form-text text-danger"></small>
+                <input value="" type="text" name="nama" id="nama" class="form-control" required>
+                <small id="error-nama" class="error-text form-text text-danger"></small>
             </div>
             <div class="form-group">
                 <label>Password</label>
@@ -46,7 +46,7 @@
             rules: {
                 level_id: {required: true, number: true},
                 username: {required: true, minlength: 3, maxlength: 20},
-                name: {required: true, minlength: 3, maxlength: 100},
+                nama: {required: true, minlength: 3, maxlength: 100},
                 password: {required: true, minlength: 6, maxlength: 20}
             },
             submitHandler: function(form) {

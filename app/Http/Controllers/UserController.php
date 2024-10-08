@@ -262,7 +262,7 @@ class UserController extends Controller
             $rules = [
                 'level_id' => 'required|integer',
                 'username' => 'required|string|min:3|unique:m_user,username',
-                'name' => 'required|string|max:100',
+                'nama' => 'required|string|max:100',
                 'password' => 'required:min:6'
             ];
             $validator = Validator::make($request->all(), $rules);
