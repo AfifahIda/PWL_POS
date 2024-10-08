@@ -49,7 +49,7 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-1 control-label col-form-label">No. Telp</label>
+                        <label class="col-1 control-label col-form-label">Supplier Telepon</label>
                         <div class="col-11">
                             <input type="text" class="form-control" id="supplier_telepon" name="supplier_telepon"
                                 value="{{ old('supplier_telepon', $supplier->supplier_telepon) }}" required>
