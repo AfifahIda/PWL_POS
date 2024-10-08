@@ -314,7 +314,7 @@ class UserController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'status'   => false,    // respon json, true: berhasil, false: gagal 
-                    'message'  => 'Validasi gagal.',
+                    'message'  => 'Validasi ga gal.',
                     'msgField' => $validator->errors()  // menunjukkan field mana yang error 
                 ]);
             }
@@ -324,7 +324,7 @@ class UserController extends Controller
                 if (!$request->filled('password')) { // jika password tidak diisi, maka hapus dari request 
                     $request->request->remove('password');
                 }
-                
+
                 $check->update($request->all());
                 return response()->json([
                     'status'  => true,
@@ -339,4 +339,30 @@ class UserController extends Controller
         }
         return redirect('/');
     }
+
+    public function confirm_ajax(string $id) 
+    {
+        $user = UserModel::find($id);
+
+        return view('user.confirm_ajax', ['user' => $user]);
+    }
+
+    public function delete_ajax(Request $request, string $id) {
+        if ($request->ajax() || $request->wantsJson()) {
+            $user = UserModel::find($id);
+            if ($user) {
+                $user -> delete();
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil dihapus'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
+            return redirect('/');
+        }
+    }   
 }
