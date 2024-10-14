@@ -67,6 +67,12 @@ role="menu" data-accordion="false">
                 <p>Transaksi Penjualan</p>
             </a>
         </li>
+        <li class="nav-item">
+          <a href="{{ url('/logout') }}" class="nav-link {{ $activeMenu == 'penjualan' ? 'active' : '' }} ">
+              <i class="nav-icon fas fa-door-open"></i>
+              <p>Logout</p>
+          </a>
+        </li>
       </ul>
     </nav>
 </div>

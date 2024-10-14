@@ -2,11 +2,24 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\BarangController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\LevelController;
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::pattern('id', '[0-9]+');
+
+Route::get('login', [AuthController::class, 'login'])->name('login');
+Route::post('login', [AuthController::class, 'postlogin']);
+Route::get('logout', [AuthController::class, 'logout']);
+
+
+Route::middleware(['auth'])->group(function (){
+
+
 
 //Route::get('/level', [LevelController::class, 'index']);
 //Route::get('/kategori', [KategoriController::class, 'index']);
@@ -20,7 +33,7 @@ Route::get('/user/ubah_simpan/{id}', [UserController::class, 'ubah_simpan']);
 Route::get('/user/hapus/{id}', [UserController::class, 'hapus']);
 
 
-use App\Http\Controllers\WelcomeController;
+
 Route::get('/', [WelcomeController::class, 'index']);
 
 Route::group(['prefix' => 'user'], function () {
@@ -41,7 +54,6 @@ Route::group(['prefix' => 'user'], function () {
 });
 
 
-use App\Http\Controllers\KategoriController;
 Route::get('/', [KategoriController::class, 'index']);
 
 Route::group(['prefix' => 'kategori'], function () {
@@ -62,7 +74,7 @@ Route::group(['prefix' => 'kategori'], function () {
 });
 
 
-use App\Http\Controllers\BarangController;
+
 Route::get('/', [BarangController::class, 'index']);
 
 Route::group(['prefix' => 'barang'], function () {
@@ -83,7 +95,6 @@ Route::group(['prefix' => 'barang'], function () {
 });
 
 
-use App\Http\Controllers\SupplierController;
 Route::get('/', [SupplierController::class, 'index']);
 
 Route::group(['prefix' => 'supplier'], function () {
@@ -104,7 +115,6 @@ Route::group(['prefix' => 'supplier'], function () {
 });
 
 
-use App\Http\Controllers\LevelController;
 Route::get('/', [LevelController::class, 'index']);
 
 Route::group(['prefix' => 'level'], function () {
@@ -124,6 +134,7 @@ Route::group(['prefix' => 'level'], function () {
     Route::delete('/{id}', [LevelController::class, 'destroy']);
 });
 
+});
 /*
 |--------------------------------------------------------------------------
 | Web Routes
