@@ -23,14 +23,14 @@ Route::middleware(['auth'])->group(function (){
 
 //Route::get('/level', [LevelController::class, 'index']);
 //Route::get('/kategori', [KategoriController::class, 'index']);
-Route::get('/user', [UserController::class, 'index']);
+//Route::get('/user', [UserController::class, 'index']);
 
 
-Route::get('/user/tambah', [UserController::class, 'tambah']);
-Route::post('/user/tambah_simpan', [UserController::class, 'tambah_simpan']);
-Route::get('/user/ubah/{id}', [UserController::class, 'ubah']);
-Route::get('/user/ubah_simpan/{id}', [UserController::class, 'ubah_simpan']);
-Route::get('/user/hapus/{id}', [UserController::class, 'hapus']);
+//Route::get('/user/tambah', [UserController::class, 'tambah']);
+//Route::post('/user/tambah_simpan', [UserController::class, 'tambah_simpan']);
+//Route::get('/user/ubah/{id}', [UserController::class, 'ubah']);
+//Route::get('/user/ubah_simpan/{id}', [UserController::class, 'ubah_simpan']);
+//Route::get('/user/hapus/{id}', [UserController::class, 'hapus']);
 
 
 
@@ -54,7 +54,7 @@ Route::group(['prefix' => 'user'], function () {
 });
 
 
-Route::get('/', [KategoriController::class, 'index']);
+//Route::get('/', [KategoriController::class, 'index']);
 
 Route::group(['prefix' => 'kategori'], function () {
     Route::get('/', [KategoriController::class, 'index']);
@@ -74,8 +74,7 @@ Route::group(['prefix' => 'kategori'], function () {
 });
 
 
-
-Route::get('/', [BarangController::class, 'index']);
+//Route::get('/', [BarangController::class, 'index']);
 
 Route::group(['prefix' => 'barang'], function () {
     Route::get('/', [BarangController::class, 'index']);
@@ -95,7 +94,7 @@ Route::group(['prefix' => 'barang'], function () {
 });
 
 
-Route::get('/', [SupplierController::class, 'index']);
+//Route::get('/', [SupplierController::class, 'index']);
 
 Route::group(['prefix' => 'supplier'], function () {
     Route::get('/', [SupplierController::class, 'index']);
@@ -115,33 +114,25 @@ Route::group(['prefix' => 'supplier'], function () {
 });
 
 
-Route::get('/', [LevelController::class, 'index']);
+//Route::get('/', [LevelController::class, 'index']);
 
-Route::group(['prefix' => 'level'], function () {
-    Route::get('/', [LevelController::class, 'index']);
-    Route::post('/list', [LevelController::class, 'list']);
-    Route::get('/create', [LevelController::class, 'create']);
-    Route::post('/', [LevelController::class, 'store']);
-    Route::get('/create_ajax', [LevelController::class, 'create_ajax']);
-    Route::post('/ajax', [LevelController::class, 'store_ajax']);
-    Route::get('/{id}', [LevelController::class, 'show']);
-    Route::get('/{id}/edit', [LevelController::class, 'edit']);
-    Route::put('/{id}', [LevelController::class, 'update']);
-    Route::get('/{id}/edit_ajax', [LevelController::class, 'edit_ajax']);
-    Route::put('/{id}/update_ajax', [LevelController::class, 'update_ajax']);
-    Route::get('/{id}/delete_ajax', [LevelController::class, 'confirm_ajax']);
-    Route::delete('/{id}/delete_ajax', [LevelController::class, 'delete_ajax']);
-    Route::delete('/{id}', [LevelController::class, 'destroy']);
+    Route::group(['prefix' => 'level'], function () {
+        Route::middleware(['authorize:ADM'])->group(function () {
+        Route::get('/', [LevelController::class, 'index']);
+        Route::post('/list', [LevelController::class, 'list']);
+        Route::get('/create', [LevelController::class, 'create']);
+        Route::post('/', [LevelController::class, 'store']);
+        Route::get('/create_ajax', [LevelController::class, 'create_ajax']);
+        Route::post('/ajax', [LevelController::class, 'store_ajax']);
+        Route::get('/{id}', [LevelController::class, 'show']);
+        Route::get('/{id}/edit', [LevelController::class, 'edit']);
+        Route::put('/{id}', [LevelController::class, 'update']);
+        Route::get('/{id}/edit_ajax', [LevelController::class, 'edit_ajax']);
+        Route::put('/{id}/update_ajax', [LevelController::class, 'update_ajax']);
+        Route::get('/{id}/delete_ajax', [LevelController::class, 'confirm_ajax']);
+        Route::delete('/{id}/delete_ajax', [LevelController::class, 'delete_ajax']);
+        Route::delete('/{id}', [LevelController::class, 'destroy']);
+    });
 });
 
 });
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
