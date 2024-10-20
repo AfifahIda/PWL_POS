@@ -11,6 +11,8 @@ use Illuminate\Http\RedirectResponse;
 use PhpParser\Node\Expr\Cast\Object_;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -271,7 +273,8 @@ class UserController extends Controller
                 'level_id' => 'required|integer',
                 'username' => 'required|string|min:3|unique:m_user,username',
                 'nama' => 'required|string|max:100',
-                'password' => 'required:min:6'
+                'password' => 'required:min:6',
+                'file_profile' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             ];
             $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
@@ -281,6 +284,18 @@ class UserController extends Controller
                     'msgField' => $validator->errors(),
                 ]);
             }
+
+            $fileExtension = $request->file('file_profile')->getClientOriginalExtension();
+            $fileName = 'profile_' . Auth::user()->user_id . '.' . $fileExtension;
+
+            $oldFile = 'profile_pictures/' . $fileName;
+            if (Storage::disk('public')->exists($oldFile)) {
+                Storage::disk('public')->delete($oldFile);
+            }
+            
+            $path = $request->file('file_profile')->storeAs('profile_pictures', $fileName, 'public');
+            session(['profile_img_path' => $path]);
+
             UserModel::create($request->all());
             return response()->json([
                 'status' => true,
@@ -306,7 +321,8 @@ class UserController extends Controller
                 'level_id' => 'required|integer',
                 'username' => 'required|max:20|unique:m_user,username,' . $id . ',user_id',
                 'nama'     => 'required|max:100',
-                'password' => 'nullable|min:6|max:20'
+                'password' => 'nullable|min:6|max:20',
+                'file_profile' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
             ];
 
             // use Illuminate\Support\Facades\Validator; 
@@ -318,6 +334,17 @@ class UserController extends Controller
                     'msgField' => $validator->errors()  // menunjukkan field mana yang error 
                 ]);
             }
+            
+            $fileExtension = $request->file('file_profile')->getClientOriginalExtension();
+            $fileName = 'profile_' . Auth::user()->user_id . '.' . $fileExtension;
+
+            $oldFile = 'profile_pictures/' . $fileName;
+            if (Storage::disk('public')->exists($oldFile)) {
+                Storage::disk('public')->delete($oldFile);
+            }
+            
+            $path = $request->file('file_profile')->storeAs('profile_pictures', $fileName, 'public');
+            session(['profile_img_path' => $path]);
 
             $check = UserModel::find($id);
             if ($check) {
