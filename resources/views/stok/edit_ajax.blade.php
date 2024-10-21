@@ -1,21 +1,22 @@
-@empty($user)
+@empty($stok)
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Kesalahan</h5>
                 <button type="button" class="close" data-dismiss="modal" aria label="Close"><span
-                aria-hidden="true">&times;</span></button>
+                        aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-danger">
                     <h5><i class="icon fas fa-ban"></i> Kesalahan!!!</h5>
-                    Data yang anda cari tidak ditemukan</div>
-                <a href="{{ url('/user') }}" class="btn btn-warning">Kembali</a>
+                    Data yang anda cari tidak ditemukan
+                </div>
+                <a href="{{ url('/stok') }}" class="btn btn-warning">Kembali</a>
             </div>
         </div>
     </div>
 @else
-    <form action="{{ url('/user/' . $user->user_id . '/update_ajax') }}" method="POST" id="form-edit">
+    <form action="{{ url('/stok/' . $stok->stok_id . '/update_ajax') }}" method="POST" id="form-edit">
         @csrf
         @method('PUT')
         <div id="modal-master" class="modal-dialog modal-lg" role="document">
@@ -27,40 +28,52 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Level Pengguna</label>
-                        <select name="level_id" id="level_id" class="form-control" required>
-                            <option value="">- Pilih Level -</option>
-                            @foreach ($level as $l)
-                                <option {{ $l->level_id == $user->level_id ? 'selected' : '' }} 
-                                value="{{ $l->level_id }}">{{ $l->level_nama }}</option>
+                        <label>Supplier</label>
+                        <select name="supplier_id" id="supplier_id" class="form-control" required>
+                            <option value="">- Pilih Supplier -</option>
+                            @foreach ($supplier as $l)
+                                <option {{ $l->supplier_id == $stok->supplier_id ? 'selected' : '' }}
+                                    value="{{ $l->supplier_id }}">
+                                    {{ $l->supplier_nama }}</option>
                             @endforeach
                         </select>
-                        <small id="error-level_id" class="error-text form-text text-danger"></small>
+                        <small id="error-supplier_id" class="error-text form-text text-danger"></small>
                     </div>
                     <div class="form-group">
-                        <label>Username</label>
-                        <input value="{{ $user->username }}" type="text" name="username" id="username"
-                        class="form-control" required>
-                        <small id="error-username" class="error-text form-text text-danger"></small>
+                        <label>Barang</label>
+                        <select name="barang_id" id="barang_id" class="form-control" required>
+                            <option value="">- Pilih Barang -</option>
+                            @foreach ($barang as $l)
+                                <option {{ $l->barang_id == $stok->barang_id ? 'selected' : '' }}
+                                    value="{{ $l->barang_id }}">
+                                    {{ $l->barang_nama }}</option>
+                            @endforeach
+                        </select>
+                        <small id="error-barang_id" class="error-text form-text text-danger"></small>
                     </div>
                     <div class="form-group">
-                        <label>Nama</label>
-                        <input value="{{ $user->nama }}" type="text" name="nama" id="name" class="form-control"
-                            required>
-                        <small id="error-nama" class="error-text form-text text-danger"></small>
+                        <label>User</label>
+                        <select name="user_id" id="user_id" class="form-control" required>
+                            <option value="">- Pilih User -</option>
+                            @foreach ($user as $l)
+                                <option {{ $l->user_id == $stok->user_id ? 'selected' : '' }} value="{{ $l->user_id }}">
+                                    {{ $l->name }}</option>
+                            @endforeach
+                        </select>
+                        <small id="error-user_id" class="error-text form-text text-danger"></small>
                     </div>
                     <div class="form-group">
-                        <label>Foto Profile</label>
-                        <input type="file" name="file_profil" id="file_profil" class="form-control">
-                        <small class="form-text text-muted">Abaikan jika tidak ingin ubah foto profil</small>
-                        <small id="error-file_profil" class="error-text form-text text-danger"></small>
+                        <label>Stok tanggal</label>
+                        <input value="{{ $stok->stok_tanggal->format('Y-m-d') }}" type="date" name="stok_tanggal" id="stok_tanggal"
+                            class="form-control" required>
+                        <small id="error-harga_jual" class="error-text form-text text-danger"></small>
+                        <small id="error-stok_tanggal" class="error-text form-text text-danger"></small>
                     </div>
                     <div class="form-group">
-                        <label>Password</label>
-                        <input value="" type="password" name="password" id="password" class="form-control">
-                        <small class="form-text text-muted">Abaikan jika tidak ingin ubah
-                            password</small>
-                        <small id="error-password" class="error-text form-text text-danger"></small>
+                        <label>Stok jumlah</label>
+                        <input value="{{ $stok->stok_jumlah }}" type="number" name="stok_jumlah" id="stok_jumlah"
+                            class="form-control" required>
+                        <small id="error-stok_jumlah" class="error-text form-text text-danger"></small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -74,21 +87,33 @@
         $(document).ready(function() {
             $("#form-edit").validate({
                 rules: {
-                    level_id: {required: true, number: true},
-                    username: {required: true, minlength: 3, maxlength: 20},
-                    nama: {required: true, minlength: 3, maxlength: 100},
-                    file_profile: {required: true, extension: "jpg|jpeg|png|ico|bmp"}
-                    password: {minlength: 6, maxlength: 20}
+                    supplier_id: {
+                        required: true,
+                        number: true
+                    },
+                    barang_id: {
+                        required: true,
+                        number: true
+                    },
+                    user_id: {
+                        required: true,
+                        number: true
+                    },
+                    stok_tanggal: {
+                        required: true,
+                        date: true,
+                    },
+                    stok_jumlah: {
+                        required: true,
+                    },
+                        number: true,
+                    }
                 },
                 submitHandler: function(form) {
-                    var formData = new FormData(form); // Jadikan form ke FormData untuk menghandle file 
                     $.ajax({
                         url: form.action,
                         type: form.method,
                         data: $(form).serialize(),
-                        data: formData,
-                        processData: false, // setting processData dan contentType ke false, untuk menghandle file 
-                        contentType: false,
                         success: function(response) {
                             if (response.status) {
                                 $('#myModal').modal('hide');
@@ -97,7 +122,7 @@
                                     title: 'Berhasil',
                                     text: response.message
                                 });
-                                dataUser.ajax.reload();
+                                tableStok.ajax.reload();
                             } else {
                                 $('.error-text').text('');
                                 $.each(response.msgField, function(prefix, val) {

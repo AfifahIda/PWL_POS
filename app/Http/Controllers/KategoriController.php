@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\KategoriModel;  
+use App\Models\KategoriModel;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class KategoriController extends Controller
 {
@@ -204,6 +208,13 @@ class KategoriController extends Controller
         }
     }
 
+    public function show_ajax(string $id)
+    {
+        $kategori = KategoriModel::find($id);
+
+        return view('kategori.show_ajax', ['kategori' => $kategori]);
+    }
+
     public function create_ajax()
     {
         $kategori = KategoriModel::select('kategori_id', 'kategori_nama')->get();
@@ -235,6 +246,19 @@ class KategoriController extends Controller
         }
         redirect('/');
     }
+
+    public function export_pdf()
+{
+    $kategori = KategoriModel::select('kategori_kode', 'kategori_nama')->get();
+
+    $pdf = Pdf::loadView('kategori.export_pdf', ['kategori' => $kategori]);
+    $pdf->setPaper('a4', 'portrait'); // Perbaikan dari "potrait" menjadi "portrait"
+    $pdf->setOption("isRemoteEnabled", true);
+    $pdf->render();
+    // Stream hasil PDF
+    return $pdf->stream('Data_Kategori_' . date('Y-m-d_H:i:s') . '.pdf');
+}
+
 
     public function edit_ajax(string $id)
     {
@@ -305,5 +329,73 @@ class KategoriController extends Controller
             }
             return redirect('/');
         }
+    }
+
+    public function import()
+    {
+        return view('kategori.import');
+    }
+    public function import_ajax(Request $request)
+    {
+        // Mengecek apakah request berasal dari AJAX atau JSON
+        if ($request->ajax() || $request->wantsJson()) {
+            // Validasi input file
+            $rules = [
+                'file_kategori' => ['required', 'mimes:xlsx', 'max:1024'] // hanya file .xlsx dengan max size 1MB
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            // Jika validasi gagal
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            // Memproses file
+            $file = $request->file('file_kategori');
+            $reader = IOFactory::createReader('Xlsx'); // Hanya mendukung xlsx sesuai validasi
+            $reader->setReadDataOnly(true); // Hanya baca data
+            $spreadsheet = $reader->load($file->getRealPath()); // Baca file dari path
+            $sheet = $spreadsheet->getActiveSheet(); // Ambil sheet yang aktif
+            $data = $sheet->toArray(null, false, true, true); // Ambil data dalam bentuk array
+
+            $insert = [];
+
+            // Jika data lebih dari 1 baris (berarti ada data selain header)
+            if (count($data) > 1) {
+                foreach ($data as $baris => $value) {
+                    if ($baris > 1) { // Lewati baris pertama (header)
+                        $insert[] = [
+                            'kategori_kode' => $value['C'], // Kolom A
+                            'kategori_nama' => $value['D'], // Kolom B
+                        ];
+                    }
+                }
+
+                // Insert ke database jika ada data yang diimport
+                if (count($insert) > 0) {
+                    KategoriModel::insertOrIgnore($insert); // Insert data, abaikan jika ada duplikasi
+                }
+
+                // Response sukses
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diimport'
+                ]);
+            } else {
+                // Response jika tidak ada data
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada data yang diimport'
+                ]);
+            }
+        }
+
+        // Jika bukan request AJAX
+        return redirect('/');
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\SupplierModel;  
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SupplierController extends Controller
 {
@@ -164,6 +165,13 @@ class SupplierController extends Controller
         }
     }
 
+    public function show_ajax(string $id)
+    {
+        $supplier = SupplierModel::find($id);
+
+        return view('supplier.show_ajax', ['supplier' => $supplier]);
+    }
+
     public function create_ajax()
     {
         $supplier = SupplierModel::select('supplier_id', 'supplier_nama')->get();
@@ -198,6 +206,19 @@ class SupplierController extends Controller
         }
         redirect('/');
     }
+
+    public function export_pdf()
+{
+    $supplier = SupplierModel::select('supplier_kode', 'supplier_nama', 'supplier_alamat', 'supplier_telepon')->get();
+
+    $pdf = Pdf::loadView('supplier.export_pdf', ['supplier' => $supplier]);
+    $pdf->setPaper('a4', 'portrait'); // Perbaikan dari "potrait" menjadi "portrait"
+    $pdf->setOption("isRemoteEnabled", true);
+    $pdf->render();
+    // Stream hasil PDF
+    return $pdf->stream('Data_Supplier_' . date('Y-m-d_H:i:s') . '.pdf');
+}
+
 
     public function edit_ajax(string $id)
     {

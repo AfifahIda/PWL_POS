@@ -180,6 +180,13 @@ class BarangController extends Controller
         }
     }
 
+    public function show_ajax(string $id)
+    {
+        $barang = BarangModel::find($id);
+
+        return view('barang.show_ajax', ['barang' => $barang]);
+    }
+
     public function create_ajax()
     {
         $kategori = KategoriModel::select('kategori_id', 'kategori_nama')->get();

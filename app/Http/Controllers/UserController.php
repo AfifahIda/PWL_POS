@@ -13,6 +13,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class UserController extends Controller
 {
@@ -163,8 +164,7 @@ class UserController extends Controller
     }
 
     // menampilkan detail user
-    public function show(string $id)
-{
+    public function show(string $id){
     // Ambil data user beserta levelnya berdasarkan ID
     $user = UserModel::with('level')->find($id);
 
@@ -258,6 +258,14 @@ class UserController extends Controller
         }
     }
 
+    public function show_ajax(string $id)
+    {
+        $user = UserModel::find($id);
+        $level = LevelModel::all();
+
+        return view('user.show_ajax', ['user' => $user, 'level' => $level]);
+    }
+
     public function create_ajax()
     {
         $level = LevelModel::select('level_id', 'level_nama')->get();
@@ -294,7 +302,7 @@ class UserController extends Controller
             }
             
             $path = $request->file('file_profile')->storeAs('profile_pictures', $fileName, 'public');
-            session(['profile_img_path' => $path]);
+            $request['image_profile'] = $path;
 
             UserModel::create($request->all());
             return response()->json([
@@ -304,6 +312,19 @@ class UserController extends Controller
         }
         redirect('/');
     }
+
+    public function export_pdf()
+{
+    $user = UserModel::select('level_id', 'username', 'nama')->get();
+
+    $pdf = Pdf::loadView('user.export_pdf', ['user' => $user]);
+    $pdf->setPaper('a4', 'portrait'); // Perbaikan dari "potrait" menjadi "portrait"
+    $pdf->setOption("isRemoteEnabled", true);
+    $pdf->render();
+    // Stream hasil PDF
+    return $pdf->stream('Data_User_' . date('Y-m-d_H:i:s') . '.pdf');
+}
+
 
     public function edit_ajax(string $id)
     {
@@ -344,8 +365,11 @@ class UserController extends Controller
             }
             
             $path = $request->file('file_profile')->storeAs('profile_pictures', $fileName, 'public');
-            session(['profile_img_path' => $path]);
-
+            $request['image_profile'] = $path;
+            if (!$request->filled('image_profile')) { // jika password tidak diisi, maka hapus dari request 
+                $request->request->remove('image_profile');
+            }
+            
             $check = UserModel::find($id);
             if ($check) {
                 if (!$request->filled('password')) { // jika password tidak diisi, maka hapus dari request 
