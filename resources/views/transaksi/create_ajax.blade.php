@@ -55,42 +55,6 @@
             </div>
         </div>
     </div>
-    <!-- Modal for adding a new transaction detail (barang) -->
-    <div id="modal-tambah-barang" class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Tambah Barang</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="barang_id">Barang</label>
-                    <select name="barang_id" id="barang_id" class="form-control">
-                        <option value="">- Pilih Barang -</option>
-                        @foreach ($barang as $b)
-                            <option value="{{ $b->barang_id }}">{{ $b->barang_nama }}</option>
-                        @endforeach
-                    </select>
-                    <small id="error-barang_id" class="error-text form-text text-danger"></small>
-                </div>
-                <div class="form-group">
-                    <label for="jumlah">Jumlah</label>
-                    <input type="number" name="jumlah" id="jumlah" class="form-control">
-                    <small id="error-jumlah" class="error-text form-text text-danger"></small>
-                </div>
-                <div class="form-group">
-                    <label for="harga">Harga</label>
-                    <input type="number" name="harga" id="harga" class="form-control">
-                    <small id="error-harga" class="error-text form-text text-danger"></small>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="save-barang">Simpan</button>
-            </div>
-        </div>
-    </div>
 </form>
 <script>
     let transaksiDetails = [];

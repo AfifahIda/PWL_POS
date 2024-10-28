@@ -8,6 +8,9 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
 class TransaksiController extends Controller
 {
     public function index()
@@ -140,7 +143,7 @@ class TransaksiController extends Controller
     }
     public function create_ajax()
     {
-        $user = UserModel::select('user_id', 'name')->get();
+        $user = UserModel::select('user_id', 'nama')->get();
         $barang  = BarangModel::select('barang_id', 'barang_nama')->get();
         return view('transaksi.create_ajax')->with('user', $user)->with('barang', $barang);
     }
@@ -185,7 +188,7 @@ class TransaksiController extends Controller
     public function edit_ajax(string $id)
     {
         $transaksi = TransaksiModel::with(['transaksiDetail.barang'])->find($id);
-        $user = UserModel::select('user_id', 'name')->get();
+        $user = UserModel::select('user_id', 'nama')->get();
         $barang  = BarangModel::select('barang_id', 'barang_nama')->get();
         // dd($transaksi->user);
         return view('transaksi.edit_ajax', ['transaksi' => $transaksi, 'user' => $user, 'barang' => $barang]);
@@ -290,5 +293,128 @@ class TransaksiController extends Controller
         $pdf->setOption('isRemoteEnabled', true);
         $pdf->render();
         return $pdf->stream('Data Transaksi' . date('Y-m-d H:i:s') . '.pdf');
+    }
+
+    public function import()
+    {
+        return view('transaksi.import');
+    }
+    public function import_ajax(Request $request)
+    {
+        // Mengecek apakah request berasal dari AJAX atau JSON
+        if ($request->ajax() || $request->wantsJson()) {
+            // Validasi input file
+            $rules = [
+                'file_transaksi' => ['required', 'mimes:xlsx', 'max:1024'] // hanya file .xlsx dengan max size 1MB
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            // Jika validasi gagal
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            // Memproses file
+            $file = $request->file('file_transaksi');
+            $reader = IOFactory::createReader('Xlsx'); // Hanya mendukung xlsx sesuai validasi
+            $reader->setReadDataOnly(true); // Hanya baca data
+            $spreadsheet = $reader->load($file->getRealPath()); // Baca file dari path
+            $sheet = $spreadsheet->getActiveSheet(); // Ambil sheet yang aktif
+            $data = $sheet->toArray(null, false, true, true); // Ambil data dalam bentuk array
+
+            $insert = [];
+
+            // Jika data lebih dari 1 baris (berarti ada data selain header)
+            if (count($data) > 1) {
+                foreach ($data as $baris => $value) {
+                    if ($baris > 1) { // Lewati baris pertama (header)
+                        $insert[] = [
+                            'user_id' => $value['A'],
+                            'penjualan_kode' => $value['B'],
+                            'pembeli' => $value['C'],
+                            'penjualan_tanggal' => $value['D'],
+                            'created_at' => now(),
+                        ];
+                    }
+                }
+
+                // Insert ke database jika ada data yang diimport
+                if (count($insert) > 0) {
+                    TransaksiModel::insertOrIgnore($insert); // Insert data, abaikan jika ada duplikasi
+                }
+
+                // Response sukses
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diimport'
+                ]);
+            } else {
+                // Response jika tidak ada data
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada data yang diimport'
+                ]);
+            }
+        }
+
+        // Jika bukan request AJAX
+        return redirect('/');
+    }
+
+    public function export_excel()
+    {
+        $transaksi = TransaksiModel::select('user_id', 'penjualan_kode', 'pembeli', 'penjualan_tanggal')
+            ->orderBy('user_id')
+            ->with('user')
+            ->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'User');
+        $sheet->setCellValue('C1', 'Pembeli');
+        $sheet->setCellValue('D1', 'Kode Penjualan');
+        $sheet->setCellValue('E1', 'Tanggal Penjulan');
+
+        $sheet->getStyle('A1:E1')->getFont()->setBold(true);
+
+        $no = 1;
+        $baris = 2;
+        foreach ($transaksi as $key => $value) {
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $value->user->nama);
+            $sheet->setCellValue('C' . $baris, $value->pembeli);
+            $sheet->setCellValue('D' . $baris, $value->penjualan_kode);
+            $sheet->setCellValue('E' . $baris, $value->penjualan_tanggal);
+            $baris++;
+            $no++;
+        }
+
+        foreach (range('A', 'E') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $sheet->setTitle('Data Transaksi');
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data Transaksi ' . date('Y-m-d H:i:s') . '.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, dMY H:i:s') . 'GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+        
+        $writer->save('php://output');
+        exit;
     }
 }

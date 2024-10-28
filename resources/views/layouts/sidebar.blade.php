@@ -14,10 +14,15 @@ placeholder="Search" aria-label="Search">
       
       <!-- Sidebar Menu -->
       <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" 
-role="menu" data-accordion="false">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{{ url('/profil') }}" class="nav-link {{ $activeMenu == 'profil' ? 'active' : '' }} ">
+                <i class="nav-icon far fa-address-card"></i>
+                <p>Edit Profile</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ url('/') }}" class="nav-link {{ $activeMenu == 'dashboard' ? 'active' : '' }} ">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>Dashboard</p>
             </a>

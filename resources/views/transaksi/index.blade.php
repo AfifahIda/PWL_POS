@@ -4,11 +4,12 @@
         <div class="card-header">
             <h3 class="card-title">Daftar transaksi</h3>
             <div class="card-tools">
-                <a class="btn btn-sm btn-primary mt-1" href="{{ url('transaksi/create') }}">Tambah</a>
+                <button onclick="modalAction('{{ url('penjualan/import') }}')" class="btn btn-sm btn-success mt-1">Import Transaksi</button>
+                <a href="{{ url('/penjualan/export_excel') }}" class="btn btn-primary"><i class="fa fa-file-excel"></i> Export Transaksi</a>
                 <a href="{{ url('/penjualan/export_pdf') }}" class="btn btn-warning"><i class="fa fa-file-pdf"></i> Export
                     Transaksi</a>
                 <button onclick="modalAction('{{ url('/penjualan/create_ajax') }}')" class="btn btn-success">Tambah
-                    Data(Ajax)</button>
+                    Ajax</button>
             </div>
         </div>
         <div class="card-body">

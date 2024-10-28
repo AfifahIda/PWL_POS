@@ -5,10 +5,11 @@
         <div class="card-header">
             <h3 class="card-title">Daftar stok</h3>
             <div class="card-tools">
-                <a class="btn btn-sm btn-primary mt-1" href="{{ url('stok/create') }}">Tambah</a>
+                <button onclick="modalAction('{{ url('stok/import') }}')" class="btn btn-sm btn-success mt-1">Import Stok</button>
+                <a href="{{ url('/stok/export_excel') }}" class="btn btn-primary"><i class="fa fa-file-excel"></i> Export Stok</a>
                 <a href="{{ url('/stok/export_pdf') }}" class="btn btn-warning"><i class="fa fa-file-pdf"></i> Export Stok</a>
                 <button onclick="modalAction('{{ url('/stok/create_ajax') }}')" class="btn btn-success">Tambah
-                    Data(Ajax)</button>
+                    Ajax</button>
             </div>
         </div>
         <div class="card-body">

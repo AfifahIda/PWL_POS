@@ -13,25 +13,28 @@ class UserModel extends Authenticatable
 
     protected $table = 'm_user';
     protected $primaryKey = 'user_id';
-    protected $fillable = ['username', 'nama', 'password', 'level_id', 'image_profile', 'created_at', 'updated_at'];
-
+    protected $fillable = ['username', 'nama', 'password', 'level_id', 'foto', 'created_at', 'updated_at'];
     protected $hidden = ['password'];
 
-    protected $casts = ['password' => 'hashed'];
+    protected $casts = ['password' => 'hashed', 'foto' => 'string'];
 
-    public function level(): BelongsTo{
+    public function level(): BelongsTo
+    {
         return $this->belongsTo(LevelModel::class, 'level_id', 'level_id');
     }
 
-    public function getRoleName(): string{
-        return $this->level->level_nama;
-    }
-    
-    public function hasRole($role): bool{
-        return $this->level->level_kode == $role;
+    public function getRoleName(): string
+    {
+        return $this->level ? $this->level->level_nama : 'Unknown';
     }
 
-    public function getRole(){
-        return $this->level->level_kode;
+    public function hasRole($role): bool
+    {
+        return $this->level && $this->level->level_kode === $role;
+    }
+
+    public function getRole()
+    {
+        return $this->level ? $this->level->level_kode : null;
     }
 }

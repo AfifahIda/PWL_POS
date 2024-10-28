@@ -21,10 +21,11 @@ class AuthController extends Controller
         if ($request->ajax() || $request->wantsJson()) {
             $credentials = $request->only('username', 'password');
             if (Auth::attempt($credentials)) {
+                session(['user_id' => Auth::user()->user_id]);
                 if (Auth::user()->image_profile != "") {
                     session(['profile_img_path' => Auth::user()->image_profile]);
                 }
-                session(['user_id' => Auth::user()->user_id]);
+                
                 
                 return response()->json([
                     'status' => true,

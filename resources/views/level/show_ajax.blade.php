@@ -1,4 +1,4 @@
-@empty($user)
+@empty($level)
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -11,7 +11,7 @@
                     <h5><i class="icon fas fa-ban"></i> Kesalahan!!!</h5>
                     Data yang anda cari tidak ditemukan
                 </div>
-                <a href="{{ url('/user') }}" class="btn btn-warning">Kembali</a>
+                <a href="{{ url('/level') }}" class="btn btn-warning">Kembali</a>
             </div>
         </div>
     </div>
@@ -27,34 +27,15 @@
                 <table class="table table-bordered table-striped table-hover table-sm">
                     <tr>
                         <th>ID</th>
-                        <td>{{ $user->user_id }}</td>
+                        <td>{{ $level->level_id }}</td>
                     </tr>
                     <tr>
-                        <th>Level</th>
-                        <td>{{ $user->level->level_nama }}</td>
+                        <th>Level Kode</th>
+                        <td>{{ $level->level_kode }}</td>
                     </tr>
                     <tr>
-                        <th>Username</th>
-                        <td>{{ $user->username }}</td>
-                    </tr>
-                    <tr>
-                        <th>Nama</th>
-                        <td>{{ $user->nama }}</td>
-                    </tr>
-                    <tr>
-                        <th>Foto Profil</th>
-                        <td>
-                            @if ($user->image_profile != "")
-                                <img id="profile-picture" src="{{ asset('storage/' . $user->image_profile) }}"
-                                    alt="Profile Picture" class="brand-image img-circle elevation-3 w-25 h-25">
-                            @else
-                                <span>Ra enek mas</span>
-                            @endif
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Password</th>
-                        <td>********</td>
+                        <th>Level Nama</th>
+                        <td>{{ $level->level_nama }}</td>
                     </tr>
                 </table>
             </div>

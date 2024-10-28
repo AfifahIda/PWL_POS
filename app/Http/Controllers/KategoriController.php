@@ -370,8 +370,9 @@ class KategoriController extends Controller
                 foreach ($data as $baris => $value) {
                     if ($baris > 1) { // Lewati baris pertama (header)
                         $insert[] = [
-                            'kategori_kode' => $value['C'], // Kolom A
-                            'kategori_nama' => $value['D'], // Kolom B
+                            'kategori_kode' => $value['C'], 
+                            'kategori_nama' => $value['D'],
+                            'created_at' => now(),
                         ];
                     }
                 }
@@ -397,5 +398,52 @@ class KategoriController extends Controller
 
         // Jika bukan request AJAX
         return redirect('/');
+    }
+
+    public function export_excel()
+    {
+        $kategori = KategoriModel::select('kategori_kode', 'kategori_nama')
+            ->orderBy('kategori_id')
+            ->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Kategori Kode');
+        $sheet->setCellValue('C1', 'Kategori Nama');
+
+        $sheet->getStyle('A1:C1')->getFont()->setBold(true);
+
+        $no = 1;
+        $baris = 2;
+        foreach ($kategori as $key => $value) {
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $value->kategori_kode);
+            $sheet->setCellValue('C' . $baris, $value->kategori_nama);
+            $baris++;
+            $no++;
+        }
+
+        foreach (range('A', 'C') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $sheet->setTitle('Data Kategori');
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data Kategori' . date('Y-m-d H:i:s') . '.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, dMY H:i:s') . 'GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+        
+        $writer->save('php://output');
+        exit;
     }
 }

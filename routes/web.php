@@ -10,6 +10,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\StokController;
 use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\ProfileController;
 
 
 Route::pattern('id', '[0-9]+');
@@ -211,9 +212,20 @@ Route::middleware(['authorize:ADM'])->group(function () {
             Route::delete('/{id}/delete_ajax', [TransaksiController::class, 'delete_ajax']);
             Route::get('/import', [TransaksiController::class, 'import']);
             Route::post('/import_ajax', [TransaksiController::class, 'import_ajax']);
+            Route::get('/export_excel', [TransaksiController::class, 'export_excel']);
             Route::get('/export_pdf', [TransaksiController::class, 'export_pdf']);
             Route::get('{id}/export_detail_pdf', [TransaksiController::class, 'export_detail_pdf']);
             Route::delete('/{id}', [TransaksiController::class, 'destroy']);
         });
     });
+
+Route::middleware(['authorize:ADM,MNG,STF,CUS'])->group(function() {
+    Route::get('/profil', [ProfileController::class, 'index']);
+    Route::get('/profil/{id}', [ProfileController::class, 'show']);
+    Route::get('/profil/{id}/edit_ajax', [ProfileController::class, 'edit_ajax']);
+    Route::put('/profil/{id}/update_ajax', [ProfileController::class, 'update_ajax']);
+    Route::get('/profil/{id}/edit_foto', [ProfileController::class, 'edit_foto']);
+    Route::post('profil/{id}/update_foto', [ProfileController::class, 'update_foto'])->name('update_foto');
+});
+
 });
