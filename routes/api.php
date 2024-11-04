@@ -20,7 +20,8 @@ use App\Http\Controllers\Api\UserController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::post('/register', App\Http\Controllers\Api\RegisterController::class)->name('registerapi');
+//Route::post('/register', App\Http\Controllers\Api\RegisterController::class)->name('registerapi');
+Route::post('/register1', App\Http\Controllers\Api\RegisterController::class)->name('register1');
 Route::post('/login', App\Http\Controllers\Api\LoginController::class)->name('loginapi');
 Route::post('/logout', App\Http\Controllers\Api\LogoutController::class)->name('logout');
 

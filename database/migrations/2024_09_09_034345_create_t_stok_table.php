@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if(!Schema::hasTable('t_stok')){
         Schema::create('t_stok', function (Blueprint $table) {
             $table->id('stok_id');
             $table->unsignedBigInteger('supplier_id')->index();
@@ -24,6 +25,7 @@ return new class extends Migration
             $table->foreign('barang_id')->references('barang_id')->on('m_barang');
             $table->foreign('user_id')->references('user_id')->on('m_user');
         });
+    }
     }
 
     /**

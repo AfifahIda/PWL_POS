@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if(!Schema::hasTable('t_penjualan')){
         Schema::create('t_penjualan', function (Blueprint $table) {
             $table->id('penjualan_id');
             $table->unsignedBigInteger('user_id')->index();
@@ -21,6 +22,7 @@ return new class extends Migration
 
             $table->foreign('user_id')->references('user_id')->on('m_user');
         });
+    }
     }
 
     /**
