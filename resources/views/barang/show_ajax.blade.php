@@ -49,6 +49,13 @@
                         <th>Kategori</th>
                         <td>{{ $barang->kategori->kategori_nama }}</td>
                     </tr>
+                    <tr>
+                        <th>Barang Image</th>
+                        <td>
+                            <img id="profile-picture" src="{{ $barang->image }}" alt="Barang picture"
+                                class="brand-image img-circle">
+                        </td>
+                    </tr>
                 </table>
             </div>
             <div class="modal-footer">
